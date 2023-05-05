@@ -138,7 +138,7 @@ def adjust_dropout(weights, prev_p, new_p):
 
 def get_data(path, target_size=(224,224)):
     batches = get_batches(path, shuffle=False, batch_size=1, class_mode=None, target_size=target_size)
-    return np.concatenate([batches.next() for i in range(batches.nb_sample)])
+    return np.concatenate([batches.next() for _ in range(batches.nb_sample)])
 
 
 def plot_confusion_matrix(cm, classes, normalize=False, title='Confusion matrix', cmap=plt.cm.Blues):
@@ -234,9 +234,9 @@ class MixIterator(object):
         self.iters = iters
         self.multi = type(iters) is list
         if self.multi:
-            self.N = sum([it[0].N for it in self.iters])
+            self.N = sum(it[0].N for it in self.iters)
         else:
-            self.N = sum([it.N for it in self.iters])
+            self.N = sum(it.N for it in self.iters)
 
     def reset(self):
         for it in self.iters: it.reset()
@@ -247,11 +247,9 @@ class MixIterator(object):
     def next(self, *args, **kwargs):
         if self.multi:
             nexts = [[next(it) for it in o] for o in self.iters]
-            n0 = np.concatenate([n[0] for n in nexts])
-            n1 = np.concatenate([n[1] for n in nexts])
-            return (n0, n1)
         else:
             nexts = [next(it) for it in self.iters]
-            n0 = np.concatenate([n[0] for n in nexts])
-            n1 = np.concatenate([n[1] for n in nexts])
-            return (n0, n1)
+
+        n0 = np.concatenate([n[0] for n in nexts])
+        n1 = np.concatenate([n[1] for n in nexts])
+        return (n0, n1)
